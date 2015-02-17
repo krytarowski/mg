@@ -13,7 +13,7 @@ DPADD+=	${LIBCURSES} ${LIBUTIL}
 #	XKEYS		-- use termcap function key definitions.
 #				note: XKEYS and bsmap mode do _not_ get along.
 #
-CFLAGS+=-Wall -DFKEYS -DREGEX -DXKEYS
+CFLAGS+=-Wall -DFKEYS -DREGEX -DXKEYS -D_OPENBSD_SOURCE
 
 SRCS=	autoexec.c basic.c bell.c buffer.c cinfo.c dir.c display.c \
 	echo.c extend.c file.c fileio.c funmap.c help.c kbd.c keymap.c \
