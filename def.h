@@ -1,4 +1,4 @@
-/*	$OpenBSD: def.h,v 1.140 2014/03/22 11:05:37 lum Exp $	*/
+/*	$OpenBSD: def.h,v 1.146 2015/05/08 12:35:08 bcallah Exp $	*/
 
 /* This file is in the public domain. */
 
@@ -10,8 +10,6 @@
  * per-terminal definitions are in special header files.
  */
 
-#include	"sysdef.h"	/* Order is critical.		 */
-#include	"ttydef.h"
 #include	"chrdef.h"
 
 typedef int	(*PF)(int, int);	/* generally useful type */
@@ -23,13 +21,13 @@ typedef int	(*PF)(int, int);	/* generally useful type */
 #define NBUFN	NFILEN		/* Length, buffer name.		 */
 #define NLINE	256		/* Length, line.		 */
 #define PBMODES 4		/* modes per buffer		 */
-#define NKBDM	256		/* Length, keyboard macro.	 */
 #define NPAT	80		/* Length, pattern.		 */
 #define HUGE	1000		/* A rather large number.	 */
 #define NSRCH	128		/* Undoable search commands.	 */
 #define NXNAME	64		/* Length, extended command.	 */
 #define NKNAME	20		/* Length, key names.		 */
 #define NTIME	50		/* Length, timestamp string.	 */
+
 /*
  * Universal.
  */
@@ -61,13 +59,6 @@ typedef int	(*PF)(int, int);	/* generally useful type */
 #define FIOERR	3		/* Error.			 */
 #define FIOLONG 4		/* long line partially read	 */
 #define FIODIR 5		/* File is a directory		 */
-
-/*
- * Directory I/O.
- */
-#define DIOSUC	0		/* Success.			 */
-#define DIOEOF	1		/* End of file.			 */
-#define DIOERR	2		/* Error.			 */
 
 /*
  * Display colors.
@@ -106,6 +97,12 @@ typedef int	(*PF)(int, int);	/* generally useful type */
 #define KREG	0x04		/* This is a region-based kill */
 
 #define MAX_TOKEN 64
+
+/*
+ * Previously from sysdef.h
+ */
+typedef int	RSIZE;		/* Type for file/region sizes    */
+typedef short	KCHAR;		/* Type for internal keystrokes  */
 
 /*
  * This structure holds the starting position
@@ -235,6 +232,17 @@ struct undo_rec;
 TAILQ_HEAD(undoq, undo_rec);
 
 /*
+ * Previously from sysdef.h
+ * Only used in struct buffer.
+ */
+struct fileinfo {
+        uid_t           fi_uid;
+        gid_t           fi_gid;
+        mode_t          fi_mode;
+        struct timespec fi_mtime;       /* Last modified time */
+};
+
+/*
  * Text is kept in buffers. A buffer header, described
  * below, exists for every buffer in the system. The buffers are
  * kept in a big list, so that commands that search for a buffer by
@@ -297,6 +305,16 @@ struct undo_rec {
 	int		 pos;
 	char		*content;
 };
+
+/*
+ * Previously from ttydef.h
+ */
+#define STANDOUT_GLITCH			/* possible standout glitch	*/
+
+#define putpad(str, num)	tputs(str, num, ttputc)
+
+#define KFIRST	K00
+#define KLAST	K00
 
 /*
  * Prototypes.
@@ -363,7 +381,6 @@ struct line	*lalloc(int);
 int		 lrealloc(struct line *, int);
 void		 lfree(struct line *);
 void		 lchange(int);
-int		 linsert_str(const char *, int);
 int		 linsert(int, int);
 int		 lnewline_at(struct line *, int);
 int		 lnewline(void);
@@ -383,7 +400,6 @@ int		 yank(int, int);
 
 /* window.c X */
 struct mgwin	*new_window(struct buffer *);
-void		 free_window(struct mgwin *);
 int		 reposition(int, int);
 int		 redraw(int, int);
 int		 do_redraw(int, int, int);
@@ -435,7 +451,6 @@ int		 eyorn(const char *);
 int		 eynorr(const char *);
 int		 eyesno(const char *);
 void		 ewprintf(const char *fmt, ...);
-char		*ereply(const char *, char *, size_t, ...);
 char		*eread(const char *, char *, size_t, int, ...);
 int		 getxtra(struct list *, struct list *, int, int);
 void		 free_file_list(struct list *);
@@ -510,7 +525,7 @@ int		 showcpos(int, int);
 int		 getcolpos(struct mgwin *);
 int		 twiddle(int, int);
 int		 openline(int, int);
-int		 newline(int, int);
+int		 enewline(int, int);
 int		 deblank(int, int);
 int		 justone(int, int);
 int		 delwhite(int, int);
@@ -630,7 +645,6 @@ int		 executemacro(int, int);
 /* modes.c X */
 int		 indentmode(int, int);
 int		 fillmode(int, int);
-int		 blinkparen(int, int);
 #ifdef NOTAB
 int		 notabmode(int, int);
 #endif	/* NOTAB */
@@ -716,9 +730,7 @@ extern int		 dovisiblebell;
 extern char	 	 cinfo[];
 extern char		*keystrings[];
 extern char		 pat[NPAT];
-#ifndef NO_DPROMPT
 extern char		 prompt[];
-#endif	/* !NO_DPROMPT */
 
 /*
  * Globals.

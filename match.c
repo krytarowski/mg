@@ -1,4 +1,4 @@
-/*	$OpenBSD: match.c,v 1.16 2009/06/04 02:23:37 kjell Exp $	*/
+/*	$OpenBSD: match.c,v 1.18 2015/03/19 21:22:15 bcallah Exp $	*/
 
 /* This file is in the public domain. */
 
@@ -9,6 +9,10 @@
  * other characters.  It would be better to have a full-blown syntax table,
  * but there's enough overhead in the editor as it is.
  */
+
+#include <sys/queue.h>
+#include <signal.h>
+#include <stdio.h>
 
 #include "def.h"
 #include "key.h"
@@ -77,8 +81,7 @@ balance(void)
 
 	/*
 	 * Move behind the inserted character.	We are always guaranteed
-	 * that there is at least one character on the line, since one was
-	 * just self-inserted by blinkparen.
+	 * that there is at least one character on the line.
 	 */
 	clp = curwp->w_dotp;
 	cbo = curwp->w_doto - 1;

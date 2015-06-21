@@ -1,4 +1,4 @@
-/*	$OpenBSD: echo.c,v 1.56 2014/03/20 07:47:29 lum Exp $	*/
+/*	$OpenBSD: echo.c,v 1.58 2015/03/19 21:22:15 bcallah Exp $	*/
 
 /* This file is in the public domain. */
 
@@ -9,14 +9,18 @@
  * of the display screen. Used by the entire known universe.
  */
 
+#include <sys/queue.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <term.h>
+
 #include "def.h"
+#include "funmap.h"
 #include "key.h"
 #include "macro.h"
-
-#include "funmap.h"
-
-#include <stdarg.h>
-#include <term.h>
 
 static char	*veread(const char *, char *, size_t, int, va_list);
 static int	 complt(int, int, char *, size_t, int, int *);
@@ -817,9 +821,9 @@ ewprintf(const char *fmt, ...)
 }
 
 /*
- * Printf style formatting. This is called by both "ewprintf" and "ereply"
- * to provide formatting services to their clients.  The move to the start
- * of the echo line, and the erase to the end of the echo line, is done by
+ * Printf style formatting. This is called by "ewprintf" to provide
+ * formatting services to its clients.  The move to the start of the
+ * echo line, and the erase to the end of the echo line, is done by
  * the caller. 
  * %c prints the "name" of the supplied character.
  * %k prints the name of the current key (and takes no arguments).

@@ -1,4 +1,4 @@
-/*	$OpenBSD: kbd.c,v 1.25 2012/04/12 04:47:59 lum Exp $	*/
+/*	$OpenBSD: kbd.c,v 1.28 2015/03/25 12:29:03 bcallah Exp $	*/
 
 /* This file is in the public domain. */
 
@@ -6,19 +6,19 @@
  *	Terminal independent keyboard handling.
  */
 
+#include <sys/queue.h>
+#include <signal.h>
+#include <stdio.h>
+
 #include "def.h"
 #include "kbd.h"
 #include "key.h"
 #include "macro.h"
 
-#ifndef METABIT
 #define METABIT 0x80
-#endif /* !METABIT */
 
-#ifndef NO_DPROMPT
 #define PROMPTL 80
 char	 prompt[PROMPTL] = "", *promptp = prompt;
-#endif /* !NO_DPROMPT */
 
 static int mgwrap(PF, int, int);
 
@@ -75,7 +75,6 @@ getkey(int flag)
 {
 	int	 c;
 
-#ifndef NO_DPROMPT
 	if (flag && !pushed) {
 		if (prompt[0] != '\0' && ttwait(2000)) {
 			/* avoid problems with % */
@@ -87,7 +86,6 @@ getkey(int flag)
 		if (promptp > prompt)
 			*(promptp - 1) = ' ';
 	}
-#endif /* !NO_DPROMPT */
 	if (pushed) {
 		c = pushedc;
 		pushed = FALSE;
@@ -105,14 +103,12 @@ getkey(int flag)
 		pushed = TRUE;
 		c = CCHR('[');
 	}
-#ifndef NO_DPROMPT
 	if (flag && promptp < &prompt[PROMPTL - 5]) {
 		promptp = getkeyname(promptp,
 		    sizeof(prompt) - (promptp - prompt) - 1, c);
 		*promptp++ = '-';
 		*promptp = '\0';
 	}
-#endif /* !NO_DPROMPT */
 	return (c);
 }
 
@@ -149,9 +145,7 @@ doin(void)
 	KEYMAP	*curmap;
 	PF	 funct;
 
-#ifndef NO_DPROMPT
 	*(promptp = prompt) = '\0';
-#endif /* !NO_DPROMPT */
 	curmap = curbp->b_modes[curbp->b_nmodes]->p_map;
 	key.k_count = 0;
 	while ((funct = doscan(curmap, (key.k_chars[key.k_count++] =

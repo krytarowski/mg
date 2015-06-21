@@ -1,4 +1,4 @@
-/*	$OpenBSD: chrdef.h,v 1.6 2005/04/03 02:09:28 db Exp $	*/
+/*	$OpenBSD: chrdef.h,v 1.9 2015/03/19 21:22:15 bcallah Exp $	*/
 
 /* This file is in the public domain. */
 
@@ -9,8 +9,7 @@
 
 /*
  * Casting should be at least as efficient as anding with 0xff,
- * and won't have the size problems.  Override in sysdef.h if no
- * unsigned char type.
+ * and won't have the size problems.
  */
 #define	CHARMASK(c)	((unsigned char) (c))
 
@@ -41,11 +40,6 @@
  */
 #define CCHR(x)		((x) ^ 0x40)	/* CCHR('?') == DEL */
 
-#ifndef	METACH
-#define	METACH		CCHR('[')
-#endif
-
-#ifdef XKEYS
 #define	K00		256
 #define	K01		257
 #define	K02		258
@@ -78,4 +72,3 @@
 #define	K1D		285
 #define	K1E		286
 #define	K1F		287
-#endif

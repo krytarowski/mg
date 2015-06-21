@@ -1,4 +1,4 @@
-/*	$OpenBSD: random.c,v 1.32 2013/03/25 11:41:44 florian Exp $	*/
+/*	$OpenBSD: random.c,v 1.34 2015/03/16 13:47:48 bcallah Exp $	*/
 
 /* This file is in the public domain. */
 
@@ -9,9 +9,12 @@
  * are all command processors.
  */
 
-#include "def.h"
-
+#include <sys/queue.h>
 #include <ctype.h>
+#include <signal.h>
+#include <stdio.h>
+
+#include "def.h"
 
 /*
  * Display a bunch of useful information about the current location of dot.
@@ -189,7 +192,7 @@ openline(int f, int n)
  */
 /* ARGSUSED */
 int
-newline(int f, int n)
+enewline(int f, int n)
 {
 	int	 s;
 
