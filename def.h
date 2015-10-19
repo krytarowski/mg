@@ -1,4 +1,4 @@
-/*	$OpenBSD: def.h,v 1.146 2015/05/08 12:35:08 bcallah Exp $	*/
+/*	$OpenBSD: def.h,v 1.150 2015/09/29 02:07:49 guenther Exp $	*/
 
 /* This file is in the public domain. */
 
@@ -288,7 +288,8 @@ struct buffer {
 #define BFOVERWRITE 0x08		/* overwrite mode		 */
 #define BFREADONLY  0x10		/* read only mode		 */
 #define BFDIRTY     0x20		/* Buffer was modified elsewhere */
-#define BFIGNDIRTY  0x40		/* Ignore modifications */
+#define BFIGNDIRTY  0x40		/* Ignore modifications 	 */
+#define BFDIREDDEL  0x80		/* Dired has a deleted 'D' file	 */
 /*
  * This structure holds information about recent actions for the Undo command.
  */
@@ -451,7 +452,8 @@ int		 eyorn(const char *);
 int		 eynorr(const char *);
 int		 eyesno(const char *);
 void		 ewprintf(const char *fmt, ...);
-char		*eread(const char *, char *, size_t, int, ...);
+char		*eread(const char *, char *, size_t, int, ...)
+				__attribute__((__format__ (printf, 1, 5)));
 int		 getxtra(struct list *, struct list *, int, int);
 void		 free_file_list(struct list *);
 
@@ -587,6 +589,8 @@ int		 fillpara(int, int);
 int		 killpara(int, int);
 int		 fillword(int, int);
 int		 setfillcol(int, int);
+int		 markpara(int, int);
+int		 transposepara(int, int);
 
 /* word.c X */
 int		 backword(int, int);
